@@ -1,47 +1,49 @@
 import React, { useState } from 'react'
-import { Modal, Button, Input } from 'antd'
+import { Modal, Button } from 'antd'
+import PlayerForm from './player_form'
 
 const AddPlayer = (props) => {
     const [isModalVisible, setIsModalVisible] = useState(false)
-    const [name, setName] = useState("Name")
-    const [money, setMoney] = useState(1500)
-
     
     const showModal = () => {
         setIsModalVisible(true)
     }
 
-    const handleOk = () => {
+    const handleSubmit = (values) => {
         setIsModalVisible(false)
-        props.onAdd(name, money)
+        props.onAdd(values.player, values.amount)
     }
 
     const handleCancel = () => {
         setIsModalVisible(false)
     }
 
+    const clearGame = () => {
+        localStorage.setItem('notifications', JSON.stringify([]))
+        localStorage.setItem('players', JSON.stringify([
+            {
+                key: 1,
+                name: "Bank",
+                money: 100000
+            },{
+                key: 2,
+                name: "Free Parking",
+                money: 0
+            }
+        ]))
+        window.location.reload(false)
+    }
+
     return (
-        <div style={{margin: '20px'}}>
-            <Button type="primary" onClick={showModal}>
+        <div>
+            <Button style={{margin: '20px'}} type="primary" onClick={showModal}>
                Add Player
             </Button>
-            <Modal title="Basic Modal" visible={isModalVisible} onOk={handleOk} onCancel={handleCancel}>
-                <div style={{ marginBottom: 16 }}>
-                    <Input 
-                        addonBefore="Name" 
-                        defaultValue={name} 
-                        onChange={(value) => setName(value.target.defaultValue)} 
-                    />
-                </div>
-                <div style={{ marginBottom: 16 }}>
-                    <Input 
-                        addonBefore="Money" 
-                        min={0} 
-                        max={100000} 
-                        defaultValue={money} 
-                        onChange={(value) => setMoney(value.target.defaultValue)} 
-                    />
-                </div>
+            <Button type="secondary" onClick={clearGame}>
+               Clear Game
+            </Button>
+            <Modal footer={null} title="Basic Modal" visible={isModalVisible} onCancel={handleCancel}>
+                <PlayerForm onSubmit={handleSubmit} />
             </Modal>
         </div>
     )
