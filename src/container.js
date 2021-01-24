@@ -1,8 +1,17 @@
 import React, { useEffect, useState } from "react";
-import { Table, Space, Button, List, Input, Modal } from "antd";
+import { Table, Space, Button, List, Input, Popover } from "antd";
 import AddPlayer from "./add_player";
 import GetMoney from "./transfer_money";
-import { ExceptionMap } from "antd/lib/result";
+
+const clirules = (
+  <div>
+    <p>$$$ from p1 to p2,p3,p4 [for reason]</p>
+    <p>$$$ to p1,p2,p3 from p4 [for reason]</p>
+    <p>p1 pass</p>
+    <p>p1 land</p>
+    <p>p1 park</p>
+  </div>
+);
 
 const Container = () => {
   const [players, setPlayers] = useState([]);
@@ -33,12 +42,11 @@ const Container = () => {
   }, []);
 
   const inputUpdate = (event) => {
-    console.log(event.nativeEvent);
-    if (event.nativeEvent.inputType == "insertText") {
+    if (event.nativeEvent.inputType === "insertText") {
       setInputVal(inputVal + event.nativeEvent.data);
-    } else if (event.nativeEvent.inputType == "deleteContentBackward") {
+    } else if (event.nativeEvent.inputType === "deleteContentBackward") {
       setInputVal(inputVal.substr(0, inputVal.length - 1));
-    } else if (event.nativeEvent.inputType == "insertFromPaste") {
+    } else if (event.nativeEvent.inputType === "insertFromPaste") {
       setInputVal(inputVal + event.nativeEvent.data);
     }
   };
@@ -67,13 +75,10 @@ const Container = () => {
   };
 
   const handleTransfer = (player, other_info) => {
-    console.log("player", player);
-    console.log("otherinfo", other_info);
     // handle transferring money from one player to another
     const lucky_players = players.filter((player) =>
       other_info.players.includes(player.key)
     );
-    console.log(lucky_players);
 
     // extracts the names of the lucky players with some magic js
     const lucky_player_names = lucky_players
@@ -156,20 +161,11 @@ const Container = () => {
   };
 
   const handleInputEnter = (event) => {
-    let cmd = event.nativeEvent.originalTarget.value.trim();
+    let cmd = inputVal.trim();
     let res = handleCommand(cmd);
     if (res) {
       setInputVal("");
     }
-  };
-
-  const hideModal = () => {
-    setModalVisible(false);
-  };
-
-  const showModal = () => {
-    console.log("show modal");
-    setModalVisible(true);
   };
 
   const handleCommand = (str) => {
@@ -193,7 +189,7 @@ const Container = () => {
         handleTransfer(playerFrom, {
           amount: parseInt(match[1]),
           players: playersTo,
-          reason: match[5],
+          reason: match[5] ?? "reasons unknown",
         });
       } else if (trans2.test(str)) {
         let match = trans2.exec(str);
@@ -203,7 +199,7 @@ const Container = () => {
         handleTransfer(playerFrom, {
           amount: parseInt(match[1]),
           players: playersTo,
-          reason: match[5],
+          reason: match[5] ?? "reasons unknown",
         });
       } else if (pass.test(str)) {
         let match = pass.exec(str);
@@ -293,26 +289,16 @@ const Container = () => {
         placeholder="Scrubs use buttons"
         onChange={inputUpdate}
         addonAfter={
-          <Button type="secondary" onClick={showModal}>
-            Show Help
-          </Button>
+          <Popover content={clirules} title="The cli rules">
+            <Button type="secondary" onClick={null}>
+              Show Help
+            </Button>
+          </Popover>
         }
         size="large"
         value={inputVal}
         onPressEnter={handleInputEnter}
       />
-      <Modal
-        title="Command Forms"
-        visible={modalVisible}
-        onOk={hideModal}
-        onCancel={hideModal}
-      >
-    <p>$$$ from p1 to p2,p3,p4 [for reason]</p>
-    <p>$$$ to p1,p2,p3 from p4 [for reason]</p>
-    <p>p1 pass</p>
-    <p>p1 land</p>
-    <p>p1 park</p>
-      </Modal>
 
       <List
         header={null}
