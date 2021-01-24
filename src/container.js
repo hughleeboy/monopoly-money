@@ -2,26 +2,25 @@ import React, { useEffect, useState } from 'react'
 import { Table, Space, Button, List } from 'antd'
 import AddPlayer from './add_player'
 import GetMoney from './transfer_money'
-// import { List, Typography, Divider } from 'antd';
 
 const Container = () => {
 
-    const [players, setPlayers] = useState([
-        {
-            key: 1,
-            name: "Bank",
-            money: 100000
-        },{
-            key: 2,
-            name: "Free Parking",
-            money: 0
-        }
-    ])
+    const [players, setPlayers] = useState([])
     const [notifications, setNotifications] = useState([])
 
     useEffect(() => {
-        const test_players = JSON.parse(localStorage.getItem('players'))
-        const test_notifications = JSON.parse(localStorage.getItem('notifications'))
+        const test_players = JSON.parse(localStorage.getItem('players')) ? JSON.parse(localStorage.getItem('players')) : [
+            {
+                key: 1,
+                name: "Bank",
+                money: 100000
+            },{
+                key: 2,
+                name: "Free Parking",
+                money: 0
+            }
+        ]
+        const test_notifications = JSON.parse(localStorage.getItem('notifications')) ? JSON.parse(localStorage.getItem('notifications')) : []
         setPlayers(test_players)
         setNotifications(test_notifications)
     },[])
